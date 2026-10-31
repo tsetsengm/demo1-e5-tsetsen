@@ -247,12 +247,11 @@
         }
         .footer-logo-text {
             font-family: 'General Sans', -apple-system, sans-serif;
-            font-size: 21.9vw;
+            font-size: 15vw;               /* JS подгоняет точно под ширину экрана */
             font-weight: 400;
             color: #ffffff;
-            letter-spacing: -0.03em;
-            margin-right: -0.03em;
-            transform: translateX(-20px);
+            letter-spacing: -0.02em;
+            margin-right: -0.02em;
             line-height: 0.8;
             margin-top: 0;
             margin-bottom: 0;
@@ -260,8 +259,8 @@
             text-align: center;
             width: 100%;
             pointer-events: none;
-            opacity: 0.95;
-            text-shadow: none;
+            opacity: 1;
+            text-shadow: 0 2px 30px rgba(0, 0, 0, 0.35);   /* читаемость на светлых участках видео */
             white-space: nowrap;
         }
         .footer-logo-text .letter-wrapper {
@@ -269,6 +268,7 @@
             overflow: hidden;
             vertical-align: bottom;
             line-height: 0.8;
+            padding-top: 0.12em;   /* запас сверху, чтобы маска не обрезала заглавные буквы */
         }
         .footer-logo-text .letter-inner {
             display: inline-block;
@@ -280,7 +280,7 @@
         @keyframes letter-reveal-mask {
             0%   { opacity: 0; transform: translateX(-105%); filter: blur(20px); }
             25%  { opacity: 1; }
-            100% { opacity: 0.95; transform: translateX(0); filter: blur(0); }
+            100% { opacity: 1; transform: translateX(0); filter: blur(0); }
         }
 
         /* ---------- Background video ---------- */
@@ -411,7 +411,7 @@
     </footer>
 
     <div class="footer-logo-wrap">
-        <h2 class="footer-logo-text">Loopstack</h2>
+        <h2 class="footer-logo-text">NEWNOMADS</h2>
     </div>
 
     <div class="video-container">
@@ -454,6 +454,24 @@
                     wrapper.appendChild(inner);
                     logoText.appendChild(wrapper);
                 });
+
+                // Подгоняем размер шрифта так, чтобы слово целиком помещалось по ширине экрана
+                const fitLogo = () => {
+                    logoText.style.fontSize = '';
+                    const available = logoText.clientWidth;
+                    let total = 0;
+                    logoText.querySelectorAll('.letter-wrapper').forEach(w => {
+                        total += w.getBoundingClientRect().width;
+                    });
+                    if (total > 0) {
+                        const current = parseFloat(getComputedStyle(logoText).fontSize);
+                        logoText.style.fontSize = `${current * (available / total) * 0.98}px`;
+                    }
+                };
+
+                fitLogo();
+                document.fonts.ready.then(fitLogo);
+                window.addEventListener('resize', fitLogo);
             }
 
             // Разделение верхнего заголовка на слова для анимации появления снизу вверх из маски с блюром
